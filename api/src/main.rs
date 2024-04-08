@@ -21,4 +21,10 @@ fn rocket() -> _ {
             routes::manga::index,
             routes::manga::test
         ])
+        .mount("/anime", routes![
+            routes::anime::index
+        ])
+        .mount("/movies", routes![
+            routes::movies::index
+        ])
 }

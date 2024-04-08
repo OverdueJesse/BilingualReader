@@ -10,12 +10,13 @@ const HelloWorld = () => {
   }, [])
 
   const testFunc =  async () => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}`)
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/manga`)
     setTest(res.data);
+    console.log(res.data);
   }
 
   return (
-    <div>{test && test.description}</div>
+    <div>{test && test.title}</div>
   )
 }
 
