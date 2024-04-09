@@ -1,30 +1,17 @@
-#[macro_use] extern crate rocket;
-
-use rocket::serde::json::Json;
+#[macro_use]
+extern crate rocket;
 
 mod routes;
-use routes::manga::ApiTest;
-
-#[get("/")]
-fn index() -> Json<ApiTest> {
-    return Json(ApiTest {
-        title: String::from("Hello"),
-        description: String::from("World")
-      });
-}
+use routes::{anime, manga, movies};
 
 #[launch]
 fn rocket() -> _ {
+    let manga_routes = routes![manga::index, manga::view_manga, manga::get_manga, manga::test,];
+    let anime_routes = routes![anime::index];
+    let movie_routes = routes![movies::index];
+
     rocket::build()
-        .mount("/", routes![index])
-        .mount("/manga", routes![
-            routes::manga::index,
-            routes::manga::test
-        ])
-        .mount("/anime", routes![
-            routes::anime::index
-        ])
-        .mount("/movies", routes![
-            routes::movies::index
-        ])
+        .mount("/manga", manga_routes)
+        .mount("/anime", anime_routes)
+        .mount("/movies", movie_routes)
 }
