@@ -6,7 +6,7 @@ use routes::{anime, manga, movies};
 
 #[launch]
 fn rocket() -> _ {
-    let manga_routes = routes![manga::index, manga::view_manga, manga::get_manga, manga::test,];
+    let manga_routes = routes![manga::index, manga::view_manga, manga::get_manga,];
     let anime_routes = routes![anime::index];
     let movie_routes = routes![movies::index];
 

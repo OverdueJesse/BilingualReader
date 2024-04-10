@@ -1,21 +1,20 @@
 use crate::routes::manga::structs::Manga;
-// use std::io::prelude::*;
-// use zip::{result::ZipResult, ZipArchive};
-use std::fs;
+use std::fs::{self, File};
+use zip::{result::ZipResult, ZipArchive};
 
-// fn zip_to_struct(reader: impl Read + Seek) -> ZipResult<()> {
-//     let mut zip = ZipArchive::new(reader)?;
+use super::structs::MangaThumbnail;
 
-//     for i in 0..zip.len() {
-//         let mut file = zip.by_index(i)?;
-//         println!("Filename: {}", file.name());
-//         let _ = std::io::copy(&mut file, &mut std::io::stdout());
-//     }
+fn zip_to_struct(path: &str) -> ZipResult<()> {
+    let file = File::open(path)?;
+    let zip = ZipArchive::new(file);
 
-//     Ok(())
-// }
+    for file in zip.iter() {
+        println!("{}", file.len());
+    }
+    Ok(())
+}
 
-fn get_lang_path (lang: &str) -> String {
+fn get_lang_path(lang: &str) -> String {
     match lang {
         "jp" => "B://漫画/日本語".to_string(),
         "en" => "B://漫画/English".to_string(),
@@ -23,25 +22,25 @@ fn get_lang_path (lang: &str) -> String {
     }
 }
 
-fn get_manga_path (lang: &str, title: &str) -> String {
-    let mut path = get_lang_path(lang);
-    path.push_str(title);
-    path
+fn get_manga_path(lang: &str, title: &str) -> String {
+    get_lang_path(lang) + "/" + title
 }
 
 pub fn get_single_manga(lang: &str, title: &str) -> Manga {
-    let _path = get_manga_path(lang, title);
+    let path = get_manga_path(lang, title);
+    let _test = zip_to_struct(path.as_str());
     Manga {
-        title: title.to_string(),
-        description: lang.to_string(),
+        title: path,
+        description: "test".to_string(),
+        lang: lang.to_string(),
     }
 }
 
-pub fn list_dir(lang: &str) -> Vec<String> {
+pub fn list_dir(lang: &str) -> Vec<MangaThumbnail> {
     let path = get_lang_path(lang);
 
     let paths = fs::read_dir(path).unwrap();
-    let mut manga_list: Vec<String> = vec![];
+    let mut manga_list: Vec<MangaThumbnail> = vec![];
 
     for path in paths {
         let pathname = String::from(
@@ -51,15 +50,13 @@ pub fn list_dir(lang: &str) -> Vec<String> {
                 .to_str()
                 .expect("Failed to convert path"),
         );
-        if !pathname.contains(".ini") {
-            manga_list.push(pathname);
+        if !pathname.contains(".") {
+            manga_list.push(MangaThumbnail {
+                title: pathname,
+                lang: lang.to_string()
+            });
         }
     }
 
-    let mut res: Vec<String> = vec![];
-    for manga in manga_list.iter() {
-        res.push(manga.to_string());
-    }
-
-    return res;
+    return manga_list;
 }
