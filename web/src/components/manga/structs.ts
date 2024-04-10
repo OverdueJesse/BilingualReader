@@ -2,7 +2,6 @@ export type Lang = "en" | "jp";
 
 export interface Manga {
   title: string;
-  description: string;
   lang: Lang;
 }
 

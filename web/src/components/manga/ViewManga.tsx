@@ -18,12 +18,8 @@ const ViewManga = () => {
 
   useEffect(() => {
     const getManga = async () => {
-      const langs: string[] = ["en", "jp"];
-      // Object.entries(filters.langs).forEach(([key, value]) => {
-      //   if (value) langs.push(key.toString());
-      // });
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/manga/${langs.join("-")}`
+        `${import.meta.env.VITE_API_URL}/manga`
       );
       setManga(res.data);
     };
@@ -59,7 +55,7 @@ const ViewManga = () => {
 
       {manga.map((m, i) => {
         if (filters.langs[m.lang]) {
-          return <ThumbnailLink manga={m} key={i} />;
+          return <ThumbnailLink manga={m} key={`${m.title} ${i}`}/>;
         }
       })}
     </div>

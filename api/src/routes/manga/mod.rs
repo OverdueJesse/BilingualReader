@@ -1,31 +1,42 @@
 mod helpers;
+mod images;
 mod structs;
-use self::{helpers::get_single_manga, structs::MangaThumbnail};
+use helpers::{get_lang_path, get_single_manga};
+use images::get_image;
 use rocket::serde::json::Json;
-use structs::{ApiTest, Manga};
+use structs::{FileTypes, Manga, MangaThumbnail};
+
+use self::helpers::get_volume_path;
 
 #[get("/")]
-pub fn index() -> Json<Vec<ApiTest>> {
-    Json(vec![])
-}
-
-#[get("/<lang>")]
-pub fn view_manga(lang: &str) -> Json<Vec<MangaThumbnail>> {
-    let langs: Vec<&str> = lang.split('-').collect();
+pub fn view_manga() -> Json<Vec<MangaThumbnail>> {
     let mut manga_list: Vec<MangaThumbnail> = vec![];
-    for l in langs {
-        manga_list.append(&mut helpers::list_dir(l));
+    for l in vec!["en", "jp"] {
+        for title in helpers::list_dir(get_lang_path(l), FileTypes::FOLDER) {
+            manga_list.push(MangaThumbnail {
+                title,
+                lang: l.to_string(),
+            })
+        }
     }
 
     Json(manga_list)
 }
 
 #[get("/<lang>/<title>")]
-pub fn get_manga(lang: &str, title: &str) -> Json<Manga> {
-    let _manga = get_single_manga(lang, title);
-    Json(Manga {
-        title: title.to_string(),
-        description: lang.to_string(),
-        lang: lang.to_string(),
-    })
+pub fn get_manga(lang: &str, title: &str) -> Json<Vec<Manga>> {
+    let mut manga_list: Vec<Manga> = vec![];
+    for manga in get_single_manga(lang, title) {
+        manga_list.push(Manga {
+            title: manga,
+            lang: lang.to_string(),
+        })
+    }
+
+    Json(manga_list)
+}
+
+#[get("/<lang>/<title>/<volume>/<page>")]
+pub fn get_page(lang: &str, title: &str, volume: &str, page: i8) -> Json<Vec<u8>> {
+    Json(get_image(&get_volume_path(lang, title, volume), page))
 }

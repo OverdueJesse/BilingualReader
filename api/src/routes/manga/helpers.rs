@@ -1,20 +1,19 @@
-use crate::routes::manga::structs::Manga;
+use crate::routes::manga::structs::FileTypes;
 use std::fs::{self, File};
 use zip::{result::ZipResult, ZipArchive};
 
-use super::structs::MangaThumbnail;
-
-fn zip_to_struct(path: &str) -> ZipResult<()> {
+fn _zip_to_struct(path: &str) -> ZipResult<()> {
+    println!("path : {}", path);
     let file = File::open(path)?;
     let zip = ZipArchive::new(file);
 
     for file in zip.iter() {
-        println!("{}", file.len());
+        println!("here : {}", file.len());
     }
     Ok(())
 }
 
-fn get_lang_path(lang: &str) -> String {
+pub fn get_lang_path(lang: &str) -> String {
     match lang {
         "jp" => "B://漫画/日本語".to_string(),
         "en" => "B://漫画/English".to_string(),
@@ -22,25 +21,21 @@ fn get_lang_path(lang: &str) -> String {
     }
 }
 
-fn get_manga_path(lang: &str, title: &str) -> String {
+pub fn get_manga_path(lang: &str, title: &str) -> String {
     get_lang_path(lang) + "/" + title
 }
 
-pub fn get_single_manga(lang: &str, title: &str) -> Manga {
-    let path = get_manga_path(lang, title);
-    let _test = zip_to_struct(path.as_str());
-    Manga {
-        title: path,
-        description: "test".to_string(),
-        lang: lang.to_string(),
-    }
+pub fn get_volume_path(lang: &str, title: &str, volume: &str) -> String {
+    get_lang_path(lang) + "/" + title + "/" + volume
 }
 
-pub fn list_dir(lang: &str) -> Vec<MangaThumbnail> {
-    let path = get_lang_path(lang);
+pub fn get_single_manga(lang: &str, title: &str) -> Vec<String> {
+    list_dir(get_manga_path(lang, title), FileTypes::FOLDER)
+}
 
+pub fn list_dir(path: String, file_type: FileTypes) -> Vec<String> {
     let paths = fs::read_dir(path).unwrap();
-    let mut manga_list: Vec<MangaThumbnail> = vec![];
+    let mut entries: Vec<String> = vec![];
 
     for path in paths {
         let pathname = String::from(
@@ -50,13 +45,10 @@ pub fn list_dir(lang: &str) -> Vec<MangaThumbnail> {
                 .to_str()
                 .expect("Failed to convert path"),
         );
-        if !pathname.contains(".") {
-            manga_list.push(MangaThumbnail {
-                title: pathname,
-                lang: lang.to_string()
-            });
+        if file_type.to_bool(&pathname) {
+            entries.push(pathname);
         }
     }
 
-    return manga_list;
+    entries
 }
