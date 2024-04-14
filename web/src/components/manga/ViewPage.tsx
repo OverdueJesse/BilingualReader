@@ -15,6 +15,7 @@ const ViewPage = () => {
           import.meta.env.VITE_API_URL
         }/manga/${lang}/${title}/${volume}/${page}`
       );
+      console.log(res.data);
       setUrl(
         window.URL.createObjectURL(new Blob([new Uint8Array(res.data).buffer]))
       );

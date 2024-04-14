@@ -6,13 +6,13 @@ use images::get_image;
 use rocket::serde::json::Json;
 use structs::{FileTypes, Manga, MangaThumbnail};
 
-use self::helpers::get_volume_path;
+use self::{helpers::get_volume_path, structs::Lang};
 
 #[get("/")]
 pub fn view_manga() -> Json<Vec<MangaThumbnail>> {
     let mut manga_list: Vec<MangaThumbnail> = vec![];
-    for l in vec!["en", "jp"] {
-        for title in helpers::list_dir(get_lang_path(l), FileTypes::FOLDER) {
+    for l in vec![Lang::EN, Lang::JP] {
+        for title in helpers::list_dir(get_lang_path(l.to_string().as_str()), FileTypes::FOLDER) {
             manga_list.push(MangaThumbnail {
                 title,
                 lang: l.to_string(),

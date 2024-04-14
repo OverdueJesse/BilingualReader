@@ -26,7 +26,7 @@ pub fn get_manga_path(lang: &str, title: &str) -> String {
 }
 
 pub fn get_volume_path(lang: &str, title: &str, volume: &str) -> String {
-    get_lang_path(lang) + "/" + title + "/" + volume
+   get_manga_path(lang, title) + "/" + volume
 }
 
 pub fn get_single_manga(lang: &str, title: &str) -> Vec<String> {
@@ -34,10 +34,9 @@ pub fn get_single_manga(lang: &str, title: &str) -> Vec<String> {
 }
 
 pub fn list_dir(path: String, file_type: FileTypes) -> Vec<String> {
-    let paths = fs::read_dir(path).unwrap();
     let mut entries: Vec<String> = vec![];
 
-    for path in paths {
+    for path in fs::read_dir(path).unwrap() {
         let pathname = String::from(
             path.as_ref()
                 .unwrap()
