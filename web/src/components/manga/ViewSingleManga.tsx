@@ -22,9 +22,11 @@ const ViewSingleManga = () => {
     <>
       {volumes.map((volume, i) => {
         return (
-          <RouterLink to={`${volume.title}/${0}`} key={`Volume ${i}`}>
-            {volume.title}
-          </RouterLink>
+          <div>
+            <RouterLink to={`${volume.title}/${0}`} key={`Volume ${i}`}>
+              {volume.title}
+            </RouterLink>
+          </div>
         );
       })}
     </>

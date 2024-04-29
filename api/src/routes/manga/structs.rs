@@ -20,7 +20,7 @@ impl fmt::Display for Lang {
 pub enum FileTypes {
     CBZ,
     ZIP,
-    FOLDER
+    FOLDER,
 }
 
 impl FileTypes {
@@ -32,7 +32,7 @@ impl FileTypes {
         }
     }
 
-    pub fn to_string(&self) -> String {
+    pub fn _to_string(&self) -> String {
         match self {
             FileTypes::CBZ => ".cbz".to_string(),
             FileTypes::ZIP => ".zip".to_string(),
@@ -50,5 +50,6 @@ pub struct Manga {
 #[derive(Serialize, Deserialize)]
 pub struct MangaThumbnail {
     pub title: String,
-    pub lang: String
+    pub lang: String,
+    pub img: Vec<u8>,
 }

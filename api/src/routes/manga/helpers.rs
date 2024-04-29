@@ -15,8 +15,8 @@ fn _zip_to_struct(path: &str) -> ZipResult<()> {
 
 pub fn get_lang_path(lang: &str) -> String {
     match lang {
-        "jp" => "B://漫画/日本語".to_string(),
-        "en" => "B://漫画/English".to_string(),
+        "jp" => "./resources/manga/日本語".to_string(),
+        "en" => "./resources/manga/English".to_string(),
         _ => panic!("Language not available"),
     }
 }
@@ -44,9 +44,9 @@ pub fn list_dir(path: String, file_type: FileTypes) -> Vec<String> {
                 .to_str()
                 .expect("Failed to convert path"),
         );
-        if file_type.to_bool(&pathname) {
+       if file_type.to_bool(&pathname) {
             entries.push(pathname);
-        }
+        } 
     }
 
     entries

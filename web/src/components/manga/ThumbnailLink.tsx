@@ -1,5 +1,6 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Manga } from "./structs";
+import Thumbnail from "./Thumbnail";
 
 interface Props {
   manga: Manga;
@@ -7,9 +8,11 @@ interface Props {
 
 const ThumbnailLink = ({ manga }: Props) => {
   return (
-    <div>
-      <RouterLink to={`${manga.lang}/${manga.title}`}>{manga.title}</RouterLink>
-    </div>
+    <>
+      <RouterLink to={`${manga.lang}/${manga.title}`}>
+        <Thumbnail blob={new Blob([new Uint8Array(manga.img).buffer])} />
+      </RouterLink>
+    </>
   );
 };
 

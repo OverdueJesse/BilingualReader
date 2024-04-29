@@ -3,6 +3,7 @@ export type Lang = "en" | "jp";
 export interface Manga {
   title: string;
   lang: Lang;
+  img: number[];
 }
 
 export interface LangOptions {
@@ -13,3 +14,5 @@ export interface LangOptions {
 export interface Filters {
   langs: LangOptions;
 }
+
+export const ImageError = "ERROR";
