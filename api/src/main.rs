@@ -2,6 +2,8 @@
 extern crate rocket;
 
 mod routes;
+mod common;
+
 use routes::{anime, manga, movies};
 
 #[launch]

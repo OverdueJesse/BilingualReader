@@ -1,14 +1,19 @@
-export type Lang = "en" | "jp";
+export type Lang = "EN" | "JP";
 
 export interface Manga {
   title: string;
   lang: Lang;
   img: number[];
+  pages?: number;
+}
+
+export interface Volume {
+  title: string;
 }
 
 export interface LangOptions {
-  en: boolean;
-  jp: boolean;
+  EN: boolean;
+  JP: boolean;
 }
 
 export interface Filters {

@@ -1,6 +1,8 @@
-use crate::routes::manga::structs::FileTypes;
+use crate::routes::manga::structs::{MangaThumbnail};
 use std::fs::{self, File};
 use zip::{result::ZipResult, ZipArchive};
+use crate::routes::manga::images::get_image;
+use crate::common::{file_types::FileTypes, lang::Lang};
 
 fn _zip_to_struct(path: &str) -> ZipResult<()> {
     println!("path : {}", path);
@@ -13,24 +15,47 @@ fn _zip_to_struct(path: &str) -> ZipResult<()> {
     Ok(())
 }
 
-pub fn get_lang_path(lang: &str) -> String {
+pub fn get_lang_path(lang: Lang) -> Option<String> {
     match lang {
-        "jp" => "./resources/manga/日本語".to_string(),
-        "en" => "./resources/manga/English".to_string(),
-        _ => panic!("Language not available"),
+        Lang::JP => Some(String::from("./resources/manga/日本語")),
+        Lang::EN => Some(String::from("./resources/manga/English")),
     }
 }
 
-pub fn get_manga_path(lang: &str, title: &str) -> String {
-    get_lang_path(lang) + "/" + title
+pub fn get_manga_path(lang: Lang, title: &str) -> Option<String> {
+    match get_lang_path(lang) {
+        Some(s) => Some(s + "/" + title),
+        None => None
+    }
 }
 
-pub fn get_volume_path(lang: &str, title: &str, volume: &str) -> String {
-   get_manga_path(lang, title) + "/" + volume
+pub fn get_volume_path(lang: Lang, title: &str, volume: &str) -> Option<String> {
+    match get_manga_path(lang, title) {
+        Some(s) => Some(s + "/" + volume),
+        None => None,
+    }
 }
 
-pub fn get_single_manga(lang: &str, title: &str) -> Vec<String> {
-    list_dir(get_manga_path(lang, title), FileTypes::FOLDER)
+pub fn get_nth_volume(lang: Lang, title: &str, n: usize) -> Option<String> {
+    let paths = match get_single_manga(lang, title) {
+        Some(v) => v,
+        None => return None,
+    };
+
+    for (i,  volume) in paths.iter().enumerate() {
+        if i == n {
+            return get_volume_path(lang, title, volume);
+        }
+    }
+
+    None
+}
+
+pub fn get_single_manga(lang: Lang, title: &str) -> Option<Vec<String>> {
+    match get_manga_path(lang, title) {
+        Some(s) => Some(list_dir(s, FileTypes::FOLDER)),
+        None => return None,
+    }
 }
 
 pub fn list_dir(path: String, file_type: FileTypes) -> Vec<String> {
@@ -50,4 +75,23 @@ pub fn list_dir(path: String, file_type: FileTypes) -> Vec<String> {
     }
 
     entries
+}
+
+pub fn create_manga_thumbnail(title: String, l: Lang) -> MangaThumbnail {
+    let blank_thumbnail = MangaThumbnail {
+        title: String::from("ERROR"),
+        lang: "".to_string(),
+        img: vec![],
+    };
+
+    let volume = match get_nth_volume(l, title.as_str(), 0) {
+        Some(s) => s,
+        None => return blank_thumbnail,
+    };
+
+    MangaThumbnail {
+        title: title.clone(),
+        lang: l.to_string(),
+        img: get_image(volume.as_str(),0),
+    }
 }

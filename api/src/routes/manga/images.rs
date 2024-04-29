@@ -17,11 +17,17 @@ pub fn get_image(path: &str, page: usize) -> Vec<u8> {
         Err(_err) => return vec![],
     };
 
-    let metadata = file.metadata().expect("Could not find img metadata");
-    let mut buffer = vec![0; metadata.len() as usize];
-    file.read(&mut buffer).expect("buffer overflow");
+    let metadata = match file.metadata() {
+        Ok(metadata) => metadata,
+        Err(_err) => return vec![],
+    };
 
-    buffer
+    let mut buffer = vec![0; metadata.len() as usize];
+
+    match file.read(&mut buffer){
+        Ok(_ok) => buffer,
+        Err(_err) => vec![],
+    }
 }
 
 fn find_img_path(path: &str, page: usize) -> String {

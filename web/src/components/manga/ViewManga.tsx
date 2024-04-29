@@ -7,8 +7,8 @@ import ThumbnailLink from "./ThumbnailLink";
 
 const defaultFilters = {
   langs: {
-    en: true,
-    jp: false,
+    EN: true,
+    JP: false,
   },
 };
 
@@ -30,7 +30,7 @@ const ViewManga = () => {
   return (
     <div>
       <FormGroup>
-        {["en", "jp"].map((l, i) => {
+        {["EN", "JP"].map((l, i) => {
           const checkbox = (
             <Checkbox
               checked={filters.langs[l as keyof LangOptions]}
@@ -47,7 +47,7 @@ const ViewManga = () => {
             <FormControlLabel
               key={`Lang Filter ${i}`}
               control={checkbox}
-              label={l === "en" ? "English" : "Japanese"}
+              label={l === "EN" ? "English" : "Japanese"}
             />
           );
         })}

@@ -1,18 +1,19 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Manga } from "./structs";
+import { Volume } from "./structs";
 import { Link as RouterLink } from "react-router-dom";
 
 const ViewSingleManga = () => {
   const { lang, title } = useParams();
-  const [volumes, setVolumes] = useState<Manga[]>([]);
+  const [volumes, setVolumes] = useState<Volume[]>([]);
 
   useEffect(() => {
     const getManga = async () => {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/manga/${lang}/${title}`
       );
+      console.log(res.data);
       setVolumes(res.data);
     };
     getManga();
