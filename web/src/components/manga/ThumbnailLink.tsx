@@ -7,10 +7,11 @@ interface Props {
 }
 
 const ThumbnailLink = ({ manga }: Props) => {
+  console.log(manga);
   return (
     <>
-      <RouterLink to={`${manga.lang}/${manga.title}`}>
-        <Thumbnail blob={new Blob([new Uint8Array(manga.img).buffer])} />
+      <RouterLink to={`${manga.title.en}`}>
+        <Thumbnail blob={new Blob([new Uint8Array(manga.thumbnail).buffer])} />
       </RouterLink>
     </>
   );

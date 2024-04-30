@@ -31,6 +31,7 @@ pub fn get_image(path: &str, page: usize) -> Vec<u8> {
 }
 
 fn find_img_path(path: &str, page: usize) -> String {
+    println!("{}", path);
     let mut paths = fs::read_dir(path).unwrap();
     let page = match paths.nth(page) {
         Some(p) => p,

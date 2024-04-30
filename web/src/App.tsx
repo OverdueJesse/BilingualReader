@@ -18,7 +18,7 @@ function App() {
       element: <ViewManga />,
     },
     {
-      path: "/manga/:lang/:title",
+      path: "/manga/:title",
       element: <ViewSingleManga />,
     },
     {
