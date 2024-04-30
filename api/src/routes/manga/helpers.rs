@@ -17,19 +17,18 @@ fn _zip_to_struct(path: &str) -> ZipResult<()> {
     Ok(())
 }
 
-fn get_manga_path(title: String) -> String {
-    MANGA_ROUTE.to_owned() + "/" + &*title
-}
-
-fn get_lang_path(title: String, lang: Lang) -> String {
-    get_manga_path(title) + "/" + match lang {
-        Lang::EN => "English",
-        Lang::JP => "日本語",
-    }
-}
-
-fn get_volume_path(title: String, lang: Lang, volume: String) -> String {
-    get_lang_path(title, lang) + "/" + volume.as_str()
+macro_rules! concat_path {
+    (
+        [ $( $x:expr ),* ],($delim:expr)
+    ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            temp_vec.join($delim)
+        }
+    };
 }
 
 pub fn get_all_manga() -> Vec<Manga> {
@@ -51,7 +50,7 @@ pub fn get_single_manga(title: String) -> VolumeList {
         jp: vec![],
     };
 
-    let path = get_manga_path(title);
+    let path = concat_path!([MANGA_ROUTE.to_string(), title], ("/"));
     for l in list_dir(path.clone(), FileTypes::FOLDER) {
 
         for v in list_dir(
@@ -93,9 +92,10 @@ pub fn list_dir(path: String, file_type: FileTypes) -> Vec<String> {
 }
 
 pub fn get_nth_volume(lang: Lang, title: &str, n: usize) -> Option<String> {
-    let paths = list_dir(get_lang_path(title.to_string(), lang), FileTypes::FOLDER);
+    let path = concat_path!([MANGA_ROUTE.to_string(), title.to_string(), lang.as_path().to_string()], ("/"));
+    let paths = list_dir(path.clone(), FileTypes::FOLDER);
     match paths.get(n) {
-        Some(s) => Some(get_volume_path(title.to_string(), lang, s.clone())),
+        Some(s) => Some(concat_path!([path, s.clone()], ("/"))),
         None => None,
     }
 }
@@ -112,11 +112,11 @@ pub fn get_metadata(title: String) -> Option<Manga> {
         Err(_e) => return None,
     };
 
-    let img = MANGA_ROUTE.to_owned() + &*metadata.thumbnail;
+    let img = concat_path!([MANGA_ROUTE.to_string(), metadata.thumbnail], (""));
 
     Some(Manga {
         title: metadata.title,
         volume_count: metadata.volume_count,
-        thumbnail: get_image(img.as_str(), 0),
+        thumbnail: get_image(&img, 0),
     })
 }

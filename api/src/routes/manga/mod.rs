@@ -25,7 +25,6 @@ pub fn get_page(lang: Lang, title: &str, volume: usize, page: usize) -> Json<Vec
         Some(s) => s,
         None => return Json(vec![]),
     };
-    println!("path: {}", path);
 
     Json(get_image(path.as_str(), page))
 }

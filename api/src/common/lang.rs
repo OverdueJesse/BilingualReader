@@ -9,6 +9,15 @@ pub enum Lang {
     JP,
 }
 
+impl Lang {
+    pub fn as_path(&self) -> &str {
+        match self {
+            Lang::EN => "English",
+            Lang::JP => "日本語",
+        }
+    }
+}
+
 impl FromStr for Lang {
     type Err = ();
 
