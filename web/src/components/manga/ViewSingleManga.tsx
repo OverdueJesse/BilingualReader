@@ -1,35 +1,42 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Volume } from "./structs";
+import { VolumeList, Lang } from "./structs";
 import { Link as RouterLink } from "react-router-dom";
 
 const ViewSingleManga = () => {
-  const { lang, title } = useParams();
-  const [volumes, setVolumes] = useState<Volume[]>([]);
+  const { title } = useParams();
+  const [volumes, setVolumes] = useState<VolumeList>();
 
   useEffect(() => {
     const getManga = async () => {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/manga/${lang}/${title}`
+        `${import.meta.env.VITE_API_URL}/manga/${title}`
       );
-      console.log(res.data);
       setVolumes(res.data);
     };
     getManga();
-  }, [lang, title]);
+  }, [title]);
 
   return (
     <>
-      {volumes.map((volume, i) => {
-        return (
-          <div>
-            <RouterLink to={`${volume.title}/${0}`} key={`Volume ${i}`}>
-              {volume.title}
-            </RouterLink>
-          </div>
-        );
-      })}
+      {volumes &&
+        Object.keys(volumes).map((lang, i) => {
+          return (
+            <div key={`${lang} volumes ${i}`}>
+              <strong>{lang === "en" ? "English" : "日本語"}</strong>
+              {volumes[lang as Lang].map((v, l) => {
+                return (
+                  <div>
+                    <RouterLink to={`${lang}/${l}/0`} key={`Volume ${i}`}>
+                      {v.title}
+                    </RouterLink>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
     </>
   );
 };

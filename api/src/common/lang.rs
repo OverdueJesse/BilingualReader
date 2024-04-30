@@ -16,6 +16,8 @@ impl FromStr for Lang {
         match input. to_uppercase().as_str() {
             "EN"  => Ok(Lang::EN),
             "JP"  => Ok(Lang::JP),
+            "ENGLISH" => Ok(Lang::EN),
+            "日本語" => Ok(Lang::JP),
             _      => Err(()),
         }
     }

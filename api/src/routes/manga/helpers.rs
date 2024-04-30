@@ -1,8 +1,10 @@
-use crate::routes::manga::structs::{MangaThumbnail};
+use crate::routes::manga::structs::{Manga, Metadata, Volume, VolumeList};
 use std::fs::{self, File};
 use zip::{result::ZipResult, ZipArchive};
 use crate::routes::manga::images::get_image;
 use crate::common::{file_types::FileTypes, lang::Lang};
+
+const MANGA_ROUTE: &str = "./resources/manga";
 
 fn _zip_to_struct(path: &str) -> ZipResult<()> {
     println!("path : {}", path);
@@ -15,47 +17,60 @@ fn _zip_to_struct(path: &str) -> ZipResult<()> {
     Ok(())
 }
 
-pub fn get_lang_path(lang: Lang) -> Option<String> {
-    match lang {
-        Lang::JP => Some(String::from("./resources/manga/日本語")),
-        Lang::EN => Some(String::from("./resources/manga/English")),
+fn get_manga_path(title: String) -> String {
+    MANGA_ROUTE.to_owned() + "/" + &*title
+}
+
+fn get_lang_path(title: String, lang: Lang) -> String {
+    get_manga_path(title) + "/" + match lang {
+        Lang::EN => "English",
+        Lang::JP => "日本語",
     }
 }
 
-pub fn get_manga_path(lang: Lang, title: &str) -> Option<String> {
-    match get_lang_path(lang) {
-        Some(s) => Some(s + "/" + title),
-        None => None
-    }
+fn get_volume_path(title: String, lang: Lang, volume: String) -> String {
+    get_lang_path(title, lang) + "/" + volume.as_str()
 }
 
-pub fn get_volume_path(lang: Lang, title: &str, volume: &str) -> Option<String> {
-    match get_manga_path(lang, title) {
-        Some(s) => Some(s + "/" + volume),
-        None => None,
+pub fn get_all_manga() -> Vec<Manga> {
+    let mut manga_list = vec![];
+
+    for title in list_dir(MANGA_ROUTE.to_string(), FileTypes::FOLDER) {
+        manga_list.push(match get_metadata(title) {
+            Some(m) => m,
+            None => continue
+        });
     }
+
+    manga_list
 }
 
-pub fn get_nth_volume(lang: Lang, title: &str, n: usize) -> Option<String> {
-    let paths = match get_single_manga(lang, title) {
-        Some(v) => v,
-        None => return None,
+pub fn get_single_manga(title: String) -> VolumeList {
+    let mut volume_list: VolumeList = VolumeList {
+        en: vec![],
+        jp: vec![],
     };
 
-    for (i,  volume) in paths.iter().enumerate() {
-        if i == n {
-            return get_volume_path(lang, title, volume);
+    let path = get_manga_path(title);
+    for l in list_dir(path.clone(), FileTypes::FOLDER) {
+
+        for v in list_dir(
+            path.clone() + "/" + &*l,
+            FileTypes::FOLDER
+        ) {
+            let volume = Volume {
+                title: v,
+            };
+
+            match l.as_str() {
+                "English" => volume_list.en.push(volume),
+                "日本語" => volume_list.jp.push(volume),
+                _ => continue,
+            };
         }
     }
 
-    None
-}
-
-pub fn get_single_manga(lang: Lang, title: &str) -> Option<Vec<String>> {
-    match get_manga_path(lang, title) {
-        Some(s) => Some(list_dir(s, FileTypes::FOLDER)),
-        None => return None,
-    }
+    volume_list
 }
 
 pub fn list_dir(path: String, file_type: FileTypes) -> Vec<String> {
@@ -69,29 +84,39 @@ pub fn list_dir(path: String, file_type: FileTypes) -> Vec<String> {
                 .to_str()
                 .expect("Failed to convert path"),
         );
-       if file_type.to_bool(&pathname) {
+        if file_type.to_bool(&pathname) {
             entries.push(pathname);
-        } 
+        }
     }
 
     entries
 }
 
-pub fn create_manga_thumbnail(title: String, l: Lang) -> MangaThumbnail {
-    let blank_thumbnail = MangaThumbnail {
-        title: String::from("ERROR"),
-        lang: "".to_string(),
-        img: vec![],
-    };
-
-    let volume = match get_nth_volume(l, title.as_str(), 0) {
-        Some(s) => s,
-        None => return blank_thumbnail,
-    };
-
-    MangaThumbnail {
-        title: title.clone(),
-        lang: l.to_string(),
-        img: get_image(volume.as_str(),0),
+pub fn get_nth_volume(lang: Lang, title: &str, n: usize) -> Option<String> {
+    let paths = list_dir(get_lang_path(title.to_string(), lang), FileTypes::FOLDER);
+    match paths.get(n) {
+        Some(s) => Some(get_volume_path(title.to_string(), lang, s.clone())),
+        None => None,
     }
+}
+
+pub fn get_metadata(title: String) -> Option<Manga> {
+    let path = MANGA_ROUTE.to_owned() + "/" + &*title + "/metadata.json";
+    let file = match File::open(path) {
+        Ok(f) => f,
+        Err(_e) => return None,
+    };
+
+    let metadata: Metadata = match serde_json::from_reader(file) {
+        Ok(r) => r,
+        Err(_e) => return None,
+    };
+
+    let img = MANGA_ROUTE.to_owned() + &*metadata.thumbnail;
+
+    Some(Manga {
+        title: metadata.title,
+        volume_count: metadata.volume_count,
+        thumbnail: get_image(img.as_str(), 0),
+    })
 }

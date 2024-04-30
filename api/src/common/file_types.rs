@@ -2,6 +2,7 @@ pub enum FileTypes {
     CBZ,
     ZIP,
     FOLDER,
+    METADATA
 }
 
 impl FileTypes {
@@ -10,14 +11,16 @@ impl FileTypes {
             FileTypes::CBZ => s.contains(".cbz"),
             FileTypes::ZIP => s.contains(".zip"),
             FileTypes::FOLDER => !s.contains("."),
+            FileTypes::METADATA => s.eq("metadata.json"),
         }
     }
 
     pub fn _to_string(&self) -> String {
         match self {
-            FileTypes::CBZ => ".cbz".to_string(),
-            FileTypes::ZIP => ".zip".to_string(),
-            FileTypes::FOLDER => "Folder".to_string(),
+            FileTypes::CBZ => String::from(".cbz"),
+            FileTypes::ZIP => String::from(".zip"),
+            FileTypes::FOLDER => String::from("Folder"),
+            FileTypes::METADATA => String::from("Metadata"),
         }
     }
 }
