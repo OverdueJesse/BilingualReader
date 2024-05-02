@@ -17,14 +17,24 @@ pub struct Metadata {
 #[derive(Serialize, Deserialize)]
 pub struct Volume {
     pub title: String,
-    // pub volume_number: i32,
-    // pub page_count: i32,
+    pub metadata: VolumeMetadata,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct VolumeMetadata {
+    pub page_count: i32,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct VolumeList {
     pub en: Vec<Volume>,
     pub jp: Vec<Volume>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Page {
+    pub img: Vec<u8>,
+    pub metadata: VolumeMetadata,
 }
 
 #[derive(Serialize, Deserialize)]
