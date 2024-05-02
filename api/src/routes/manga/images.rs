@@ -2,6 +2,8 @@ use std::{
     fs::{self, File},
     io::Read,
 };
+use crate::common::file_types::FileTypes;
+use crate::routes::manga::helpers::list_dir;
 
 const IMAGE_ERROR: &str = "ERROR";
 
@@ -31,16 +33,11 @@ pub fn get_image(path: &str, page: usize) -> Vec<u8> {
 }
 
 fn find_img_path(path: &str, page: usize) -> String {
-    let mut paths = fs::read_dir(path).unwrap();
-    let page = match paths.nth(page) {
+    let mut paths = list_dir(path.to_string(), FileTypes::IMAGE);
+    let page = match paths.iter().nth(page) {
         Some(p) => p,
         None => return String::from(IMAGE_ERROR),
     };
 
-    String::from(
-        page.expect("Could not find page")
-            .file_name()
-            .to_str()
-            .expect("Failed to convert path to String"),
-    )
+    page.to_string()
 }

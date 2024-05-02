@@ -2,7 +2,8 @@ pub enum FileTypes {
     CBZ,
     ZIP,
     FOLDER,
-    METADATA
+    METADATA,
+    IMAGE,
 }
 
 impl FileTypes {
@@ -10,8 +11,9 @@ impl FileTypes {
         match self {
             FileTypes::CBZ => s.contains(".cbz"),
             FileTypes::ZIP => s.contains(".zip"),
+            FileTypes::METADATA => s.eq(".metadata.json"),
+            FileTypes::IMAGE => s.contains(".jpg") || s.contains(".png"),
             FileTypes::FOLDER => !s.contains("."),
-            FileTypes::METADATA => s.eq("metadata.json"),
         }
     }
 
@@ -21,6 +23,7 @@ impl FileTypes {
             FileTypes::ZIP => String::from(".zip"),
             FileTypes::FOLDER => String::from("Folder"),
             FileTypes::METADATA => String::from("Metadata"),
+            FileTypes::IMAGE => String::from("Image"),
         }
     }
 }

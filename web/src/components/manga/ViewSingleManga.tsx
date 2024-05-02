@@ -13,6 +13,7 @@ const ViewSingleManga = () => {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/manga/${title}`
       );
+      console.log(res.data);
       setVolumes(res.data);
     };
     getManga();

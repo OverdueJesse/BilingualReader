@@ -22,7 +22,7 @@ function App() {
       element: <ViewSingleManga />,
     },
     {
-      path: "/manga/:lang/:title/:volume/:page",
+      path: "/manga/:title/:lang/:volume/:page",
       element: <ViewPage />,
     },
   ]);

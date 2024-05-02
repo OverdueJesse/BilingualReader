@@ -1,4 +1,4 @@
-use crate::routes::manga::structs::{Manga, Metadata, Volume, VolumeList};
+use crate::routes::manga::structs::{Manga, Metadata, Volume, VolumeList, VolumeMetadata};
 use std::fs::{self, File};
 use zip::{result::ZipResult, ZipArchive};
 use crate::routes::manga::images::get_image;
@@ -50,15 +50,15 @@ pub fn get_single_manga(title: String) -> VolumeList {
         jp: vec![],
     };
 
-    let path = concat_path!([MANGA_ROUTE.to_string(), title], ("/"));
+    let path = concat_path!([MANGA_ROUTE.to_string(), title.clone()], ("/"));
     for l in list_dir(path.clone(), FileTypes::FOLDER) {
-
         for v in list_dir(
             path.clone() + "/" + &*l,
-            FileTypes::FOLDER
+            FileTypes::FOLDER,
         ) {
             let volume = Volume {
-                title: v,
+                title: v.clone(),
+                metadata: get_volume_metadata(concat_path!([path.clone(), l.clone(), v.clone()], ("/"))),
             };
 
             match l.as_str() {
@@ -101,7 +101,8 @@ pub fn get_nth_volume(lang: Lang, title: &str, n: usize) -> Option<String> {
 }
 
 pub fn get_metadata(title: String) -> Option<Manga> {
-    let path = MANGA_ROUTE.to_owned() + "/" + &*title + "/metadata.json";
+    let path = concat_path!([MANGA_ROUTE.to_owned(),  (&*title).to_string(), ".metadata.json".to_string()], ("/"));
+    println!("{path}");
     let file = match File::open(path) {
         Ok(f) => f,
         Err(_e) => return None,
@@ -119,4 +120,28 @@ pub fn get_metadata(title: String) -> Option<Manga> {
         volume_count: metadata.volume_count,
         thumbnail: get_image(&img, 0),
     })
+}
+
+pub fn get_volume_metadata(mut path: String) -> VolumeMetadata {
+    let blank_metadata = VolumeMetadata {
+        page_count: -1,
+    };
+
+    path = concat_path!(
+        [
+            path.clone(),
+            ".metadata.json".to_string()
+        ], ("/"));
+
+    println!("path: {path}");
+
+    let file = match File::open(path) {
+        Ok(f) => f,
+        Err(_e) => return blank_metadata,
+    };
+
+    match serde_json::from_reader(file) {
+        Ok(r) => r,
+        Err(_e) => return blank_metadata,
+    }
 }
