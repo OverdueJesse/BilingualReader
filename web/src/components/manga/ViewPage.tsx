@@ -44,7 +44,7 @@ const ViewPage = () => {
   ) : (
     <>
       <div>
-        <RouterLink to={`/manga/`}>Back To Manga</RouterLink>
+        <RouterLink to={`/manga/${title}`}>Back To Volumes</RouterLink>
       </div>
       <LanguageSwitch path="manga" />
       <div>

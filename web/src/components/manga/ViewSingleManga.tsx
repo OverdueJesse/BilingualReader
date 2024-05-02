@@ -21,6 +21,9 @@ const ViewSingleManga = () => {
 
   return (
     <>
+      <div>
+        <RouterLink to={`/manga/`}>Back To Manga</RouterLink>
+      </div>
       {volumes &&
         Object.keys(volumes).map((lang, i) => {
           return (
