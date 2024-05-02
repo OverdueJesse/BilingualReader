@@ -7,7 +7,6 @@ interface Props {
 }
 
 const ThumbnailLink = ({ manga }: Props) => {
-  console.log(manga);
   return (
     <>
       <RouterLink to={`${manga.title.en}`}>
